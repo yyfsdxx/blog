@@ -26,4 +26,6 @@
    ![111](<resource/屏幕截图 2024-12-29 111433.png>)
 
 ### 文章样式下载
-[mystyle1.css]()
+[mystyle1.css](https://github.com/yyfsdxx/blog/blob/master/markdown_guide/markdown/resource/mystyle1.css)
+[mystyle2.css](https://github.com/yyfsdxx/blog/blob/master/markdown_guide/markdown/resource/mystyle2.css)
+[codeblock.css](https://github.com/yyfsdxx/blog/blob/master/markdown_guide/markdown/resource/codeblock.css)
