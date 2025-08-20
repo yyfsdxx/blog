@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.entity.User;
+import org.example.plugin.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,11 @@ public class Controller {
     @PostMapping("/add")
     public  void addUsers(@RequestBody User user){
         testService.addUser(user);
+    }
+
+    @GetMapping("/page")
+    public PageResult<User> page(@RequestParam int pageNum,@RequestParam int pagesize){
+        return null;
     }
 
 }

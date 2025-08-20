@@ -72,12 +72,10 @@ public class Paginationincepter implements Interceptor {
         }
         // 虽然已经有新的boundsql，但是mappstament其他属性仍然需要，所以这里需要copy一下
         MappedStatement newMs = copyMappedStatement(ms,new BoundSqlSource(newBoundsql));
+        // 重新更新cachekey，否则会命中错误缓存
+        CacheKey newcacheKey = executor.createCacheKey(newMs, parameterObject, rowBounds, newBoundsql);
 
-
-
-
-
-        return null;
+        return executor.query(newMs,parameterObject,rowBounds,resultHandler);
     }
 
     private MappedStatement copyMappedStatement(MappedStatement ms, BoundSqlSource boundSqlSource) {
