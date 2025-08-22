@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.entity.User;
+import org.example.plugin.PageParam;
 import org.example.plugin.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +37,17 @@ public class Controller {
         testService.addUser(user);
     }
 
-    @GetMapping("/page")
-    public PageResult<User> page(@RequestParam int pageNum,@RequestParam int pagesize){
-        return null;
+    @GetMapping("/page1")
+    public PageResult<User> page1(@RequestParam int pageNum,@RequestParam int pagesize){
+        PageParam pageParam = new PageParam(pageNum, pagesize);
+        PageResult<User> pageResult = testService.page(pageParam);
+        return pageResult;
+    }
+    @GetMapping("/page2")
+    public PageResult<User> page2(@RequestParam int pageNum,@RequestParam int pagesize){
+        PageParam pageParam = new PageParam(pageNum, pagesize);
+        PageResult<User> pageResult = testService.page2(pageParam);
+        return pageResult;
     }
 
 }

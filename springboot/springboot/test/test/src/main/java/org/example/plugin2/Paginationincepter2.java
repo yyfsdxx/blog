@@ -1,6 +1,7 @@
-package org.example.plugin;
+package org.example.plugin2;
 
 import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -13,13 +14,14 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.apache.ibatis.executor.Executor;
-import org.springframework.web.servlet.handler.MappedInterceptor;
+import org.example.plugin.PageParam;
+import org.example.plugin.PaginationContext;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -34,10 +36,10 @@ import java.util.Locale;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
 })
 
-public class Paginationincepter implements Interceptor {
+public class Paginationincepter2 implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        PageParam page= PaginationContext.getPageHolder();
+        PageParam page= PageHelper.getPageHolder();
         if(page == null){
             return invocation.proceed();
         }
@@ -60,7 +62,7 @@ public class Paginationincepter implements Interceptor {
         originSql = originSql.replaceAll(";\\s*$", "");
         String countSql = "select count(*) from("+ stripOderby(originSql)+") as total_query";
         long total = queryCount(executor,ms,parameterObject,boundSql,countSql);
-        PaginationContext.setTotalHolder(total);
+        PageHelper.setTotalHolder(total);
 
         String pagesql=originSql + " LIMIT "+page.offset()+","+page.getPageSize();
         BoundSql newBoundsql = new BoundSql(ms.getConfiguration(),pagesql,boundSql.getParameterMappings(),parameterObject);
@@ -76,8 +78,17 @@ public class Paginationincepter implements Interceptor {
         // 重新更新cachekey，否则会命中错误缓存
         CacheKey newcacheKey = executor.createCacheKey(newMs, parameterObject, rowBounds, newBoundsql);
         System.out.println(newMs.getBoundSql(parameterObject).getSql().trim());
-
-        return executor.query(newMs,parameterObject,rowBounds,resultHandler);
+        Object query = executor.query(newMs, parameterObject, rowBounds, resultHandler);
+        try {
+            if(query instanceof List<?>list){
+                Page<Object> wrapper = new Page<>(page.getPageNum(), page.getPageSize(), total);
+                wrapper.addAll(list);
+                return wrapper;
+            }
+            return query;
+        }finally {
+            PageHelper.clearAll();
+        }
     }
 
     private MappedStatement copyMappedStatement(MappedStatement ms, BoundSqlSource boundSqlSource) {

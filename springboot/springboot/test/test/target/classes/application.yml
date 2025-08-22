@@ -10,3 +10,4 @@ mybatis:
   type-aliases-package: org.example.entity
   configuration:
     map-underscore-to-camel-case: true
+

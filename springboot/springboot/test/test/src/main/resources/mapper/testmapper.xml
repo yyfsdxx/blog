@@ -20,6 +20,13 @@
     <insert id="addUser" >
         INSERT INTO t_user(id,name,age) values (#{id},#{name},#{age})
     </insert>
+    
+    <select id="findAllPage" resultType="user">
+        SELECT * FROM t_user
+    </select>
+    <select id="findAllPage2" resultType="user">
+        SELECT * FROM t_user
+    </select>
 
 
 

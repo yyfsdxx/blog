@@ -1,4 +1,6 @@
-package org.example.plugin;
+package org.example.plugin2;
+
+import org.example.plugin.PageParam;
 
 /**
  * @author yufengyang
@@ -6,12 +8,12 @@ package org.example.plugin;
  * @date 2025/8/16 20:41
  * @school hnist
  */
-public class PaginationContext {
-    private PaginationContext(){}
+public class PageHelper {
+    private PageHelper(){}
     private static final ThreadLocal<PageParam> PAGE_HOLDER = new ThreadLocal<>();
     private static final ThreadLocal<Long> TOTAL_HOLDER = new ThreadLocal<>();
 
-    public static void setPageHolder(PageParam pageParam){
+    public static void startPage(PageParam pageParam){
         PAGE_HOLDER.set(pageParam);
     }
     public static void setTotalHolder(Long totalHoldder){

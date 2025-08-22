@@ -107,3 +107,96 @@ private String adminSecretKey;
 ---
 
 📅 整理日期：2025-08-06
+
+
+# MyBatis 配置方式总结
+
+在 Spring Boot 项目中，MyBatis 的配置主要有两种方式：**YAML 配置方式** 与 **XML 配置方式**。两者不要同时混用，否则会报错（`Property 'configuration' and 'configLocation' can not specified with together`）。
+
+---
+
+## 1. YAML 配置方式（推荐方式）
+
+直接在 `application.yml` 中配置 MyBatis 的参数。
+
+### 示例
+```yaml
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.example.domain
+  configuration:
+    map-underscore-to-camel-case: true   # 开启下划线转驼峰
+```
+
+### 插件配置
+插件不能写在 `yaml` 的 `configuration` 下，而是通过 **Java 配置类** 注册：
+
+```java
+@Configuration
+public class MybatisConfig {
+    @Bean
+    public Interceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
+}
+```
+
+**特点**：
+- 配置集中在 `application.yml`，简洁统一。
+- 插件通过 Java 配置类方式注入。
+- 更符合 Spring Boot 自动配置风格。
+
+---
+
+## 2. XML 配置方式
+
+通过 `mybatis-config.xml` 文件写 MyBatis 的核心配置，并在 `application.yml` 中指定 `config-location`。
+
+### `application.yml`
+```yaml
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.example.domain
+```
+
+### `mybatis-config.xml`
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+
+  <plugins>
+    <plugin interceptor="com.example.paging.PaginationInterceptor"/>
+  </plugins>
+</configuration>
+```
+
+**特点**：
+- 插件、全局参数统一写在 XML 文件里。
+- 适合已有 MyBatis XML 配置迁移的老项目。
+- 可读性较强，但和 Spring Boot 的配置文件分离。
+
+---
+
+## 3. 两种方式的比较
+
+| 维度 | YAML 配置 | XML 配置 |
+|------|-----------|----------|
+| 配置位置 | application.yml | mybatis-config.xml |
+| 插件注册 | Java Config `@Bean` | `<plugins>` 节点 |
+| 代码风格 | Spring Boot 风格，更简洁 | 传统 MyBatis 风格，更直观 |
+| 适用场景 | 新项目推荐 | 老项目迁移或对 XML 更熟悉 |
+
+---
+
+## 4. 注意事项
+- **二选一**：不能同时用 `configuration` 和 `config-location`。
+- `mapper-locations`、`type-aliases-package` 可以在两种方式下同时使用。
+- 建议新项目采用 **YAML + Java 配置插件** 的方式，更贴合 Spring Boot 风格。
+

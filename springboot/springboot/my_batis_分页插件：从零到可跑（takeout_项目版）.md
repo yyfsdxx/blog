@@ -259,7 +259,8 @@ public class PaginationInterceptor implements Interceptor {
 
     private long queryCount(Executor executor, MappedStatement ms, Object param, BoundSql boundSql, String countSql) throws SQLException {
         Configuration cfg = ms.getConfiguration();
-        try (Connection conn = executor.getTransaction().getConnection();
+        Connection conn = executor.getTransaction().getConnection();
+        try (
              PreparedStatement ps = conn.prepareStatement(countSql)) {
             ParameterHandler ph = cfg.newParameterHandler(ms, param, boundSql);
             ph.setParameters(ps);
